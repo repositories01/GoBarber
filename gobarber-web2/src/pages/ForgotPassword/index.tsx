@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
@@ -12,6 +12,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 
 import { Container, Content, AnimationContainer, Background } from './styles';
+import api from '../../services/api';
 
 interface ForgotPasswordFormData {
   email: string;
@@ -19,6 +20,7 @@ interface ForgotPasswordFormData {
 
 const ForgotPassword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const [loading, setLoading] = useState(false)
 
   const { addToast } = useToast();
   const history = useHistory();
@@ -26,6 +28,7 @@ const ForgotPassword: React.FC = () => {
   const handleSubmit = useCallback(
     async (data: ForgotPasswordFormData) => {
       try {
+        setLoading(true)
         formRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
@@ -37,9 +40,19 @@ const ForgotPassword: React.FC = () => {
         await schema.validate(data, {
           abortEarly: false,
         });
+        
+       await  api.post('/password/forgot', {
+          email: data.email
+        })
 
+        addToast({
+          type: 'success',
+          title:'E-mail enviado',
+
+          description: 'Foi enviado o e-mail de recuperação para o seu e-mail'
+
+        })
        
-        history.push('/dashboard');
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -53,6 +66,8 @@ const ForgotPassword: React.FC = () => {
           title: 'Erro na autenticação',
           description: 'Ocorreu um erro  na recuperação de senha.',
         });
+      } finally{
+        setLoading(false)
       }
     },
     [ addToast],
@@ -73,7 +88,7 @@ const ForgotPassword: React.FC = () => {
 
           </Form>
 
-          <Link to="/signin">
+          <Link to="/">
             <FiLogIn />
             Voltar ao login
           </Link>
