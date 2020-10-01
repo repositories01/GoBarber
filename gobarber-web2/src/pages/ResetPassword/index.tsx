@@ -1,15 +1,16 @@
 import React, { useRef, useCallback } from 'react';
-import {  FiLock } from 'react-icons/fi';
+import { FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 import logoImg from '../../assets/logo.svg';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import api from '../../services/api';
 
 import { Container, Content, AnimationContainer, Background } from './styles';
 
@@ -23,6 +24,7 @@ const ResetPassword: React.FC = () => {
 
   const { addToast } = useToast();
   const history = useHistory();
+  const location = useLocation()
 
   const handleSubmit = useCallback(
     async (data: ResetPasswordFormData) => {
@@ -31,12 +33,27 @@ const ResetPassword: React.FC = () => {
 
         const schema = Yup.object().shape({
           password: Yup.string().required('Senha obrigatória'),
-          password_confirmation: Yup.string()
-          .oneOf([Yup.ref('password')], 'confirmação incorreta'),
+          password_confirmation: Yup.string().oneOf(
+            [Yup.ref('password')],
+            'confirmação incorreta',
+          ),
         });
 
         await schema.validate(data, {
           abortEarly: false,
+        });
+
+        const { password, password_confirmation } = data;
+        const token = location.search.replace('?token=', '');
+
+        if (!token) {
+          throw new Error();
+        }
+
+        await api.post('/password/reset', {
+          password,
+          password_confirmation,
+          token
         });
 
         history.push('/signin');
@@ -55,7 +72,7 @@ const ResetPassword: React.FC = () => {
         });
       }
     },
-    [addToast, history],
+    [addToast, history, location.search],
   );
 
   return (
