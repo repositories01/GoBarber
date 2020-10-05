@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import DayPicker, {DayModifiers} from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
-
+import Teste from './teste'
 
 
 import {
@@ -102,6 +102,8 @@ const Dashboard: React.FC = () => {
                 <strong>Nome</strong>
               </div>
             </Appointment>
+
+            <Teste/>
           </Section>
         </Schedule>
         <Calendar>
