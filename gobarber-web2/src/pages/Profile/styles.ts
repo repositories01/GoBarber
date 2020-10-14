@@ -75,7 +75,7 @@ img{
   border-radius: 50%;
   }
 
-button{
+label{
   position:absolute;
   width:48px;
   height:48px;
@@ -83,11 +83,21 @@ button{
   border-radius: 50%;
   right: 0;
   bottom: 0;
+  cursor: pointer;
   border: 0;
+
+  display:flex;
+  align-items:center;
+  justify-content: center;
+
+  input{
+    display: none;  
+  }
 
   svg{
     height: 20px;
     width: 20px;
+    color: #312e38;
   }
 }
 `;
